@@ -29,7 +29,12 @@ module Imgix
       end
 
       def imgix_client(host)
-        return @imgix_client if @imgix_client
+        if @imgix_client
+          if !@imgix_client.instance_variable_get(:@hosts).include?(host)
+            @imgix_client.instance_variable_set(:@hosts, [host])
+          end
+          return @imgix_client
+        end
         imgix = ::Imgix::Rails.config.imgix
 
         opts = {
