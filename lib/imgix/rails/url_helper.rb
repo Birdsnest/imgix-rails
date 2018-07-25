@@ -29,12 +29,7 @@ module Imgix
       end
 
       def imgix_client(host)
-        if @imgix_client
-          if !@imgix_client.instance_variable_get(:@hosts).include?(host)
-            @imgix_client.instance_variable_set(:@hosts, [host])
-          end
-          return @imgix_client
-        end
+        return @imgix_client[host] if @imgix_client && @imgix_client[host]
         imgix = ::Imgix::Rails.config.imgix
 
         opts = {
@@ -53,7 +48,8 @@ module Imgix
           opts[:use_https] = imgix[:use_https]
         end
 
-        @imgix_client = ::Imgix::Client.new(opts)
+        @imgix_client = {} unless @imgix_client
+        @imgix_client[host] = ::Imgix::Client.new(opts)
       end
     end
   end
